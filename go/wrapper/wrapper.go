@@ -1,7 +1,7 @@
 package wrapper
 
 //#cgo CFLAGS: -g -Wall
-//#cgo LDFLAGS: -lm -L${SRCDIR}/../libs -lsymspg
+//#cgo LDFLAGS: -lm ${SRCDIR}/../libs/libsymspg.a
 //#include "spglib.h"
 import "C"
 import "unsafe"
