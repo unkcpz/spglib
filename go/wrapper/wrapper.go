@@ -6,13 +6,13 @@ package wrapper
 import "C"
 import "unsafe"
 
-func NiggliReduce(lattice [][]float64, symprec float64) int {
-  ret := C.spg_niggli_reduce(
-    (*[3]C.double)(unsafe.Pointer(&lattice[0])),
+func DelaunayReduce(lattice [3][3]float64, symprec float64) int {
+  ret := C.spg_delaunay_reduce(
+    (*[3]C.double)(unsafe.Pointer(&lattice[0][0])),
     (C.double)(symprec),
   )
   if ret == 0 {
-    panic("spg_niggli_reduce failed")
+    panic("spg_delaunay_reduce failed")
   }
   return int(ret)
 }
