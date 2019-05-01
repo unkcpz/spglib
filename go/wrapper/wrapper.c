@@ -1,7 +1,31 @@
-#include <stdio.h>
 #include "spglib.h"
 #include "wrapper.h"
 
+int spgo_delaunay_reduce(double lattice[], const double symprec) {
+  double latt[3][3];
+  mat_flat_3D(lattice, latt, 3);
+  int r = spg_delaunay_reduce(latt, symprec);
+  flat_mat_3D(latt, lattice);
+  return r;
+}
+
+int spgo_standardize_cell(double lattice[],
+                        double position[],
+                        int types[],
+                        const int num_atom,
+                        const int to_primitive,
+                        const int no_idealize,
+                        const double symprec) {
+
+	double latt[3][3];
+	double pos[num_atom][3];
+  mat_flat_3D(lattice, latt, 3);
+  mat_flat_3D(position, pos, num_atom);
+  int r = spg_standardize_cell(latt, pos, types, num_atom, to_primitive, no_idealize, symprec);
+  flat_mat_3D(latt, lattice, 3);
+  flat_mat_3D(pos, position, num_atom);
+	return r;
+}
 
 int spgo_find_primitive(double lattice[],
                         double position[],
@@ -11,60 +35,26 @@ int spgo_find_primitive(double lattice[],
 
 	double latt[3][3];
 	double pos[num_atom][3];
-	for(int i=0; i<3; i++){
-		for(int j=0; j<3; j++){
-			latt[i][j] = lattice[3*i+j];
-		}
-	}
-	for(int i=0; i<num_atom; i++){
-		for(int j=0; j<3; j++){
-			pos[i][j] = position[3*i+j];
-		}
-	}
-  showgo_cell(lattice, position, types, num_atom);
-	int r=0;
-  r = spg_find_primitive(latt, pos, types, num_atom, symprec);
-	for(int i=0; i<3; i++){
-		for(int j=0; j<3; j++){
-			lattice[3*i+j] = latt[i][j];
-		}
-	}
-	for(int i=0; i<num_atom; i++){
-		for(int j=0; j<3; j++){
-			position[3*i+j] = pos[i][j];
-		}
-	}
-  showgo_cell(lattice, position, types, num_atom);
-
+  mat_flat_3D(lattice, latt, 3);
+  mat_flat_3D(position, pos, num_atom);
+  int r = spg_find_primitive(latt, pos, types, num_atom, symprec);
+  flat_mat_3D(latt, lattice, 3);
+  flat_mat_3D(pos, position, num_atom);
 	return r;
 }
 
-static void showgo_cell(double lattice[],
-		      double position[],
-		      const int types[],
-		      const int num_atom)
-{
-  int i;
-	double latt[3][3];
-	double pos[num_atom][3];
-	for(int i=0; i<3; i++){
-		for(int j=0; j<3; j++){
-			latt[i][j] = lattice[3*i+j];
-		}
-	}
-	for(int i=0; i<num_atom; i++){
-		for(int j=0; j<3; j++){
-			pos[i][j] = position[3*i+j];
-		}
-	}
-
-  printf("Lattice parameter:\n");
-  for (i = 0; i < 3; i++) {
-    printf("%f %f %f\n", latt[0][i], latt[1][i], latt[2][i]);
+void flat_mat_3D(double mat[][3], double flat[], int n) {
+  double *pmat = &mat[0][0];
+  double *pflat = &flat[0];
+  for(int i=0; i<n*3; i++) {
+    *pflat++ = *pmat++;
   }
-  printf("Atomic positions:\n");
-  for (i = 0; i < num_atom; i++) {
-    printf("%d: %f %f %f\n",
-	   types[i], pos[i][0], pos[i][1], pos[i][2]);
+}
+
+void mat_flat_3D(double flat[], double mat[][3], int n) {
+  double *pmat = &mat[0][0];
+  double *pflat = &flat[0];
+  for(int i=0; i<n*3; i++) {
+    *pmat++ = *pflat++;
   }
 }
