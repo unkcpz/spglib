@@ -2,6 +2,9 @@
 *~
 MANIFEST
 
+go
+a.out
+
 # C extensions
 *.so
 *.lo
