@@ -2,7 +2,27 @@ package wrapper
 
 import (
   "testing"
+  "fmt"
 )
+
+func TestSpglibDatabase(t *testing.T) {
+  lattice := []float64{
+    -2, 2, 2,
+    2, -2, 2,
+    2, 2, -2,
+  }
+  position := []float64{
+    0, 0, 0,
+  }
+  types := []int{1}
+  n_atoms := 1
+
+  ds := GetDataset(lattice, position, types, n_atoms, 1e-5)
+  defer FreeDataset(ds)
+
+  r := tmpDatabase(ds)
+  fmt.Println(r)
+}
 
 func TestDelaunayReduce(t *testing.T) {
   lattice := []float64{4, 0, 0, 2, 4, 0, 0, 0, 4}

@@ -1,5 +1,8 @@
 #ifndef _WRAPPER_H
 #define _WRAPPER_H
+#endif
+
+#include "spglib.h"
 
 int spgo_delaunay_reduce(double lattice[], const double symprec);
 int spgo_standardize_cell(double lattice[],
@@ -9,12 +12,13 @@ int spgo_standardize_cell(double lattice[],
                         const int to_primitive,
                         const int no_idealize,
                         const double symprec);
-// int spgo_find_primitive(double *lattice,
-//                          double *position,
-//                          int *types,
-//                          const int num_atom,
-//                          const double symprec);
+SpglibDataset * spgo_get_dataset(double lattice[],
+                                 double position[],
+                                 int types[],
+                                 const int num_atom,
+                                 const double symprec);
+void spgo_free_dataset(SpglibDataset *dataset);
+int test_dataset(SpglibDataset *dataset);
+
 void flat_mat_3D(double mat[][3], double flat[], int n);
 void mat_flat_3D(double flat[], double mat[][3], int n);
-
-#endif

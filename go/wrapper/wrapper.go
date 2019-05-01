@@ -7,6 +7,34 @@ import "C"
 import "unsafe"
 // import "fmt"
 
+type SpglibDataset C.SpglibDataset
+
+func GetDataset(
+  lattice []float64,
+  position []float64,
+  types []int,
+  num_atom int,
+  symprec float64) *C.SpglibDataset {
+
+  tp32 := to32bit(types)
+  return C.spgo_get_dataset(
+    (*C.double)(unsafe.Pointer(&lattice[0])),
+    (*C.double)(unsafe.Pointer(&position[0])),
+    (*C.int)(unsafe.Pointer(&tp32[0])),
+    (C.int)(num_atom),
+    (C.double)(symprec),
+  )
+}
+
+func FreeDataset(dataset *C.SpglibDataset) {
+  C.spgo_free_dataset(dataset)
+}
+
+func tmpDatabase(dataset *C.SpglibDataset) int {
+  r := C.test_dataset(dataset)
+  return int(r)
+}
+
 func DelaunayReduce(lattice []float64, symprec float64) []float64 {
   ret := C.spgo_delaunay_reduce(
     (*C.double)(unsafe.Pointer(&lattice[0])),
@@ -48,6 +76,7 @@ func StandardizeCell(
   if n == 0 {
     panic("spg_standardize_cell failed")
   }
+  // Recalculate slice dynamiclly
   if int(n) > cap(position)/3 {
     outP := make([]float64, n*3, n*3)
     for i:=0; i<len(originP); i++ {
