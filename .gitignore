@@ -68,7 +68,6 @@ depcomp
 ltmain.sh
 m4/
 src/Makefile.in
-Makefile
 config.h
 libtool
 src/.deps/
