@@ -2,12 +2,19 @@ package wrapper
 
 //#cgo CFLAGS: -g -Wall
 //#cgo LDFLAGS: -lm ${SRCDIR}/../libs/libsymspg.a
+// #include <stdlib.h>
 //#include "wrapper.h"
 import "C"
 import "unsafe"
-// import "fmt"
+import "fmt"
 
-type SpglibDataset C.SpglibDataset
+type SpglibDataset struct {
+  SpacegroupNumber int
+  HallNumber int
+  InternationalSymbol string
+  HallSymbol string
+  Choice string
+}
 
 func GetDataset(
   lattice []float64,
@@ -30,9 +37,22 @@ func FreeDataset(dataset *C.SpglibDataset) {
   C.spgo_free_dataset(dataset)
 }
 
-func tmpDatabase(dataset *C.SpglibDataset) int {
-  r := C.test_dataset(dataset)
-  return int(r)
+func tmpDatabase(dataset *C.SpglibDataset) string {
+  // ptr := C.malloc(C.sizeof_char * 11)
+  // defer C.free(unsafe.Pointer(ptr))
+  //
+  // size := C.spgo_international_symbol(dataset, (*C.char)(ptr))
+  //
+  // b := C.GoBytes(ptr, size)
+  //
+  // return string(b)
+  n := 48
+  rotations := make([]int32, n*9, n*9)
+
+  r := C.spgo_dataset_rotations(dataset, (*C.int)(&rotations[0]))
+  fmt.Println(r)
+  fmt.Println(rotations)
+  return "s"
 }
 
 func DelaunayReduce(lattice []float64, symprec float64) []float64 {

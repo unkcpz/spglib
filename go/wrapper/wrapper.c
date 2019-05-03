@@ -48,22 +48,24 @@ void spgo_free_dataset(SpglibDataset *dataset) {
   spg_free_dataset(dataset);
 }
 
-int test_dataset(SpglibDataset *dataset) {
-  int i, j;
-  for (i = 0; i < dataset->n_operations; i++) {
-    printf("--- %d ---\n", i + 1);
-    for (j = 0; j < 3; j++) {
-      printf("%2d %2d %2d\n",
-	     dataset->rotations[i][j][0],
-	     dataset->rotations[i][j][1],
-	     dataset->rotations[i][j][2]);
+int spgo_international_symbol(SpglibDataset *dataset, char out[11]) {
+  int n;
+  n = sprintf(out, "%s", dataset->international_symbol);
+  return n;
+}
+
+int spgo_dataset_rotations(SpglibDataset *dataset, int *out) {
+  int n;
+  n = 0;
+  for(int i=0; i < dataset->n_operations; i++) {
+    for(int j=0; j < 3; j++) {
+	    out[n] = dataset->rotations[i][j][0],
+	    out[n+1] = dataset->rotations[i][j][1],
+	    out[n+2] = dataset->rotations[i][j][2];
+      n += 3;
     }
-    printf("%f %f %f\n",
-	   dataset->translations[i][0],
-	   dataset->translations[i][1],
-	   dataset->translations[i][2]);
   }
-  return (int)(sizeof(dataset->translations));
+  return 1;
 }
 
 void flat_mat_3D(double mat[][3], double flat[], int n) {
