@@ -6,14 +6,63 @@ package wrapper
 //#include "wrapper.h"
 import "C"
 import "unsafe"
-import "fmt"
+// import "fmt"
 
 type SpglibDataset struct {
   SpacegroupNumber int
-  HallNumber int
   InternationalSymbol string
+  HallNumber int
   HallSymbol string
-  Choice string
+
+  Noperations int
+  Rotations []int
+  Translations []float64
+}
+
+func NewSpglibDataset(
+  lattice []float64,
+  position []float64,
+  types []int,
+  num_atom int,
+  symprec float64,
+  ) *SpglibDataset {
+
+  c_dataset := GetDataset(lattice, position, types, num_atom, symprec)
+  defer FreeDataset(c_dataset)
+
+  spacegroupNumber := C.spgo_spacegroup_number(c_dataset)
+
+  ptr := C.malloc(C.sizeof_char * 11)
+  size := C.spgo_international_symbol(c_dataset, (*C.char)(ptr))
+  b := C.GoBytes(ptr, size)
+  C.free(unsafe.Pointer(ptr))
+  internationalSymbol := string(b)
+
+  hallNumber := C.spgo_hall_number(c_dataset)
+
+  ptr = C.malloc(C.sizeof_char * 17)
+  size = C.spgo_hall_symbol(c_dataset, (*C.char)(ptr))
+  b = C.GoBytes(ptr, size)
+  C.free(unsafe.Pointer(ptr))
+  hallSymbol := string(b)
+
+  nOp := C.spgo_dataset_n_operations(c_dataset)
+
+  rotations := make([]int32, nOp*9, nOp*9)
+  C.spgo_dataset_rotations(c_dataset, (*C.int)(&rotations[0]))
+
+  translations := make([]float64, nOp*3, nOp*3)
+  C.spgo_dataset_tranlations(c_dataset, (*C.double)(&translations[0]))
+
+  return &SpglibDataset{
+    SpacegroupNumber: int(spacegroupNumber),
+    InternationalSymbol:  internationalSymbol,
+    HallNumber: int(hallNumber),
+    HallSymbol: hallSymbol,
+    Noperations: int(nOp),
+    Rotations: tobit(rotations),
+    Translations: translations,
+  }
 }
 
 func GetDataset(
@@ -35,24 +84,6 @@ func GetDataset(
 
 func FreeDataset(dataset *C.SpglibDataset) {
   C.spgo_free_dataset(dataset)
-}
-
-func tmpDatabase(dataset *C.SpglibDataset) string {
-  // ptr := C.malloc(C.sizeof_char * 11)
-  // defer C.free(unsafe.Pointer(ptr))
-  //
-  // size := C.spgo_international_symbol(dataset, (*C.char)(ptr))
-  //
-  // b := C.GoBytes(ptr, size)
-  //
-  // return string(b)
-  n := 48
-  rotations := make([]int32, n*9, n*9)
-
-  r := C.spgo_dataset_rotations(dataset, (*C.int)(&rotations[0]))
-  fmt.Println(r)
-  fmt.Println(rotations)
-  return "s"
 }
 
 func DelaunayReduce(lattice []float64, symprec float64) []float64 {

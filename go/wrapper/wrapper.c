@@ -48,10 +48,28 @@ void spgo_free_dataset(SpglibDataset *dataset) {
   spg_free_dataset(dataset);
 }
 
+int spgo_spacegroup_number(SpglibDataset *dataset) {
+  return dataset->spacegroup_number;
+}
+
+int spgo_hall_number(SpglibDataset *dataset) {
+  return dataset->hall_number;
+}
+
 int spgo_international_symbol(SpglibDataset *dataset, char out[11]) {
   int n;
   n = sprintf(out, "%s", dataset->international_symbol);
   return n;
+}
+
+int spgo_hall_symbol(SpglibDataset *dataset, char out[17]) {
+  int n;
+  n = sprintf(out, "%s", dataset->hall_symbol);
+  return n;
+}
+
+int spgo_dataset_n_operations(SpglibDataset *dataset) {
+  return dataset->n_operations;
 }
 
 int spgo_dataset_rotations(SpglibDataset *dataset, int *out) {
@@ -64,6 +82,18 @@ int spgo_dataset_rotations(SpglibDataset *dataset, int *out) {
 	    out[n+2] = dataset->rotations[i][j][2];
       n += 3;
     }
+  }
+  return 1;
+}
+
+int spgo_dataset_tranlations(SpglibDataset *dataset, double *out) {
+  int n;
+  n = 0;
+  for(int i=0; i < dataset->n_operations; i++) {
+	  out[n] = dataset->translations[i][0],
+	  out[n+1] = dataset->translations[i][1],
+	  out[n+2] = dataset->translations[i][2];
+    n += 3;
   }
   return 1;
 }

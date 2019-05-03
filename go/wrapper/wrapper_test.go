@@ -2,26 +2,57 @@ package wrapper
 
 import (
   "testing"
-  "fmt"
+  // "fmt"
 )
 
-func TestSpglibDatabase(t *testing.T) {
+func TestNewSpglibDatabase(t *testing.T) {
   lattice := []float64{
-    -2, 2, 2,
-    2, -2, 2,
-    2, 2, -2,
+    4, 0, 0,
+    0, 4, 0,
+    0, 0, 4,
   }
   position := []float64{
     0, 0, 0,
+    0.5, 0.5, 0.5,
   }
-  types := []int{1}
-  n_atoms := 1
+  types := []int{1, 1}
+  n_atoms := 2
 
-  ds := GetDataset(lattice, position, types, n_atoms, 1e-5)
-  defer FreeDataset(ds)
+  goSpglibDataset := NewSpglibDataset(
+    lattice,
+    position,
+    types,
+    n_atoms,
+    1e-5,
+  )
 
-  r := tmpDatabase(ds)
-  fmt.Println(r)
+  got_0 := goSpglibDataset.SpacegroupNumber
+  if got_0 != 229 {
+    t.Errorf("spacegroupNumber, expect 229, got %d", got_0)
+  }
+
+  got_1 := goSpglibDataset.InternationalSymbol
+  if got_1 != "Im-3m" {
+    t.Errorf("international_symbol, expect Im-3m, got %s", got_1)
+  }
+
+  got_2 := goSpglibDataset.HallNumber
+  if got_2 != 529 {
+    t.Errorf("hallNumber, expect 229, got %d", got_2)
+  }
+
+  got_3 := goSpglibDataset.HallSymbol
+  if got_3 != "-I 4 2 3" {
+    t.Errorf("international_symbol, expect '-I 4 2 3', got %s", got_3)
+  }
+
+  got_4 := goSpglibDataset.Noperations
+  if got_4 != 96 {
+    t.Errorf("number of operations, expect 96, got %d", got_4)
+  }
+
+  // fmt.Println(goSpglibDataset.Rotations)
+  // fmt.Println(goSpglibDataset.Translations)
 }
 
 func TestDelaunayReduce(t *testing.T) {
