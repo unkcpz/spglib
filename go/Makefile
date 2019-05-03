@@ -1,3 +1,6 @@
+all:
+	$(MAKE) build
+	go install
 build:
 	mkdir _build/ libs/
 	cmake -B _build/ -S ..
