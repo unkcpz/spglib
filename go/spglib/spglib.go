@@ -1,48 +1,10 @@
 package spglib
 
 import (
-  "fmt"
 
   "gonum.org/v1/gonum/mat"
   "github.com/unkcpz/spglib/go/wrapper"
 )
-
-type Cell struct {
-  // Value rather than ptr here for non-mutable Cell
-
-  // Lattice
-  Lattice mat.Dense
-  //
-  Positions mat.Dense
-  //
-  Types []int
-  //
-  Natoms int
-}
-
-func NewCell(
-  lattice []float64,
-  positions []float64,
-  types []int) (*Cell, error) {
-
-  // TODO: add check here for valid Cell
-  if len(lattice) != 9 {
-    return nil, fmt.Errorf("expext 9 value as lattice")
-  }
-  if len(positions) != 3*len(types) {
-    return nil, fmt.Errorf("atom number not compatible, len(types)=%d, len(positions)/3=%d/3", len(types), len(positions))
-  }
-
-  n := len(types)
-  cell := &Cell {
-    Lattice: *mat.NewDense(3, 3, lattice),
-    Positions: *mat.NewDense(n, 3, positions),
-    Types: types,
-    Natoms: n,
-  }
-  return cell, nil
-}
-
 
 type Dataset struct {
   SpaceNumber int
@@ -55,12 +17,16 @@ type Dataset struct {
   Translations []mat.VecDense
 }
 
-func NewDataset(cell Cell, eps float64) *Dataset {
+func NewDataset(
+  lattice []float64,
+  positions []float64,
+  types []int,
+  eps float64) *Dataset {
   ds := wrapper.NewSpglibDataset(
-    MatData(cell.Lattice),
-    MatData(cell.Positions),
-    cell.Types,
-    cell.Natoms,
+    lattice,
+    positions,
+    types,
+    len(types),
     eps,
   )
 

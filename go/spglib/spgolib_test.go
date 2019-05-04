@@ -5,21 +5,12 @@ import (
   "testing"
 )
 
-func TestNewCell(t *testing.T) {
-  NewCell(
-    []float64{0,0,0,0,0,0,0,0,0},
-    []float64{0,0,0,0,0,0},
-    []int{0,0},
-  )
-}
-
 func TestNewDataset(t *testing.T) {
-  c, _ := NewCell(
+  ds := NewDataset(
     []float64{4,0,0,0,4,0,0,0,4},
     []float64{0,0,0,0.5,0.5,0.5},
     []int{1,1},
-  )
-  ds := NewDataset(*c, 1e-5)
+    1e-5)
 
   got_0 := ds.SpaceNumber
   if got_0 != 229 {
