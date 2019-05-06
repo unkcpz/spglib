@@ -13,8 +13,8 @@ type Dataset struct {
   HallSymbol string
 
   Nops int
-  Rotations []mat.Dense
-  Translations []mat.VecDense
+  Rotations []*mat.Dense
+  Translations []*mat.VecDense
 }
 
 func NewDataset(
@@ -31,11 +31,11 @@ func NewDataset(
   )
 
   nops := ds.Noperations
-  rots := make([]mat.Dense, nops, nops)
-  trans := make([]mat.VecDense, nops, nops)
+  rots := make([]*mat.Dense, nops, nops)
+  trans := make([]*mat.VecDense, nops, nops)
   for i:=0; i<nops; i++ {
-    rots[i] = *mat.NewDense(3, 3, intToFloat(ds.Rotations[i*9:i*9+9]))
-    trans[i] = *mat.NewVecDense(3, ds.Translations[i*3:i*3+3])
+    rots[i] = mat.NewDense(3, 3, intToFloat(ds.Rotations[i*9:i*9+9]))
+    trans[i] = mat.NewVecDense(3, ds.Translations[i*3:i*3+3])
   }
   rds := &Dataset{
     SpaceNumber: ds.SpacegroupNumber,
