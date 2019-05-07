@@ -18,12 +18,14 @@ type Dataset struct {
 }
 
 func NewDataset(
-  lattice []float64,
+  rowLattice []float64,
   positions []float64,
   types []int,
   eps float64) *Dataset {
+
+  colLattice := transpose(rowLattice)
   ds := wrapper.NewSpglibDataset(
-    lattice,
+    colLattice,
     positions,
     types,
     len(types),
@@ -47,6 +49,19 @@ func NewDataset(
     Translations: trans,
   }
   return rds
+}
+
+func transpose(latt []float64) []float64 {
+  r := make([]float64, 9, 9)
+  rx := 0
+  for _, e := range latt {
+    r[rx] = e
+    rx += 3
+    if rx >= 9 {
+      rx -= 8
+    }
+  }
+  return r
 }
 
 func intToFloat(a []int) []float64 {
